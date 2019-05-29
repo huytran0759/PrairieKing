@@ -6,12 +6,14 @@ import processing.core.PImage;
 
 public class Game extends PApplet {
 
-	PImage intro, background, background2, background3, background4, clock, controls, arrow, tile, lives;
+	PImage intro, background, background2, background3, background4, bossBackground, clock, controls, arrow, tile,
+			lives;
 	PFont font;
 	int windowWidth = 1280;
 	int windowHeight = 720;
 	float smallBorder, bigBorder;
-	float backgroundX, backgroundY, background2X, background2Y, background3X, background3Y, background4X, background4Y;
+	float backgroundX, backgroundY, background2X, background2Y, background3X, background3Y, background4X, background4Y,
+			bossBackgroundX, bossBackgroundY;
 	int mode;
 	ArrayList<Cactus> cacti;
 	ArrayList<Bullet> bullets;
@@ -30,13 +32,17 @@ public class Game extends PApplet {
 	boolean changeLevel;
 	boolean scrollDown;
 	boolean emptyScreen;
-	boolean barriersLvl2Init, barriersLvl3Init, barriersLvl4Init;
+	boolean barriersLvl2Init, barriersLvl3Init, barriersLvl4Init, barriersLvl5Init;
 	boolean stopControls;
-	int fireCounter, timeLeft, gameCounter, respawnCounter, spawnRate, fireCounterLimit, powerUpCounter, invincibleCounter;
+	int fireCounter, timeLeft, gameCounter, respawnCounter, spawnRate, fireCounterLimit, powerUpCounter,
+			invincibleCounter;
 	int level;
 
+	public void settings() {
+		size(1280, 720);
+	}
+
 	public void setup() {
-		size(windowWidth, windowHeight);
 		font = createFont("Cambria Math", 20);
 		textFont(font);
 		intro = loadImage("intro.png");
@@ -44,6 +50,7 @@ public class Game extends PApplet {
 		background2 = loadImage("background2.png");
 		background3 = loadImage("background3.png");
 		background4 = loadImage("background4.png");
+		bossBackground = loadImage("bossBackground.png");
 		clock = loadImage("clock.png");
 		controls = loadImage("controls.png");
 		arrow = loadImage("arrow.png");
@@ -59,9 +66,11 @@ public class Game extends PApplet {
 		background3Y = background2Y + background.height;
 		background4X = bigBorder;
 		background4Y = background3Y + background.height;
+		bossBackgroundX = bigBorder;
+		bossBackgroundY = background4Y + background.height;
 		mode = 1;
 		level = 1;
-		timeLeft = background.width - clock.width - 2;
+		timeLeft = 5;// background.width - clock.width - 2;
 		fireCounter = 0;
 		fireCounterLimit = 10;
 		cacti = new ArrayList<Cactus>();
@@ -77,6 +86,7 @@ public class Game extends PApplet {
 		barriersLvl2Init = false;
 		barriersLvl3Init = false;
 		barriersLvl4Init = false;
+		barriersLvl5Init = false;
 		stopControls = false;
 		initLvl1Cacti();
 		powerUpCounter = 0;
@@ -87,11 +97,13 @@ public class Game extends PApplet {
 		if (mode == 0) {
 			displayIntro();
 		} else if (mode == 1) {
+			System.out.println(level);
 			gameCounter++;
 			image(background, backgroundX, backgroundY);
 			image(background2, background2X, background2Y);
 			image(background3, background3X, background3Y);
 			image(background4, background4X, background4Y);
+			image(bossBackground, bossBackgroundX, bossBackgroundY);
 			drawBorders();
 			fill(255);
 			text("x" + player.getLives(), bigBorder - 45, smallBorder + 17);
@@ -107,9 +119,11 @@ public class Game extends PApplet {
 				}
 			} else {
 				respawn();
-				drawPowerUps();
-				spawnOrcs();
-				drawOrcs();
+				if (level != 5) {
+					drawPowerUps();
+					spawnOrcs();
+					drawOrcs();
+				}
 				if (!stopAnimate) {
 					if (timeLeft >= 0 && gameCounter % 10 == 0)
 						timeLeft -= 0.001;
@@ -124,7 +138,7 @@ public class Game extends PApplet {
 							player.setInvincible(false);
 							invincibleCounter = 0;
 						}
-					} 
+					}
 					if (player.getPowerUp()) {
 						powerUpCounter++;
 						if (powerUpCounter == 500) {
@@ -169,6 +183,16 @@ public class Game extends PApplet {
 						initLvl1Cacti();
 						initLvl4Barriers();
 						barriersLvl4Init = true;
+					}
+				}
+			}
+			if (level == 5) {
+				if (!changeLevel) {
+					if (!barriersLvl5Init) {
+						barriers.clear();
+						initLvl5Cacti();
+						initLvl5Barriers();
+						barriersLvl5Init = true;
 					}
 				}
 			}
@@ -233,6 +257,15 @@ public class Game extends PApplet {
 			}
 		}
 	}
+	
+	public void initLvl5Barriers() {
+		Barrier b1 = new Barrier(this, bigBorder + 256, smallBorder + 128);
+		barriers.add(b1);
+		for (int i = 0; i < 3; i++) {
+			Barrier b = new Barrier(this, bigBorder + 224 + 32 * i, windowHeight - 128);
+			barriers.add(b);
+		}
+	}
 
 	public void drawBarriers() {
 		for (int i = 0; i < barriers.size(); i++) {
@@ -293,8 +326,14 @@ public class Game extends PApplet {
 				barriers.add(a);
 				barriers.add(b);
 			}
-
 		}
+	}
+	
+	public void initLvl5Cacti() {
+		Cactus c1 = new Cactus(this, bigBorder + 160, smallBorder + 192);
+		cacti.add(c1);
+		Cactus c2 = new Cactus(this, windowWidth - bigBorder - 192, smallBorder + 192);
+		cacti.add(c2);
 	}
 
 	public void drawCacti() {
@@ -487,7 +526,10 @@ public class Game extends PApplet {
 								}
 							}
 							for (int j = 0; j < 15; j++) {
-								Explosion o = new Explosion(this, bigBorder + (float) Math.random() * (background.width - player.getSpriteWidth()), smallBorder + (float) Math.random() * (background.height - player.spriteWidth));
+								Explosion o = new Explosion(this,
+										bigBorder
+												+ (float) Math.random() * (background.width - player.getSpriteWidth()),
+										smallBorder + (float) Math.random() * (background.height - player.spriteWidth));
 								explosions.add(o);
 							}
 							p.setUsed();
@@ -512,7 +554,7 @@ public class Game extends PApplet {
 			player.setInvincible(true);
 			if (gameCounter % 10 == 0) {
 				timeLeft += 1;
-			}		
+			}
 			respawnCounter++;
 			if (respawnCounter >= 100) {
 				respawnCounter = 0;
@@ -546,7 +588,7 @@ public class Game extends PApplet {
 
 	public void spawnOrcs() {
 		spawnRate++;
-		if (spawnRate == 70 && timeLeft > 0 && !changeLevel) {
+		if (spawnRate == 100 && timeLeft > 0 && !changeLevel) {
 			spawnRate = 0;
 			float rate = (float) Math.random();
 			if (rate <= 0.05) {
@@ -693,6 +735,7 @@ public class Game extends PApplet {
 					background2Y -= 2;
 					background3Y -= 2;
 					background4Y -= 2;
+					bossBackgroundY -= 2;
 				} else if (background2Y == smallBorder) {
 					stopControls = false;
 					up = false;
@@ -710,6 +753,7 @@ public class Game extends PApplet {
 					background2Y -= 2;
 					background3Y -= 2;
 					background4Y -= 2;
+					bossBackgroundY -= 2;
 				} else if (background3Y == smallBorder) {
 					stopControls = false;
 					up = false;
@@ -722,12 +766,31 @@ public class Game extends PApplet {
 				if (scrollDown == true && background4Y != smallBorder) {
 					stopControls = true;
 					up = true;
-					player.setSpeed(1);
+					player.setSpeed((float) 1.2);
 					backgroundY -= 2;
 					background2Y -= 2;
 					background3Y -= 2;
 					background4Y -= 2;
+					bossBackgroundY -= 2;
 				} else if (background4Y == smallBorder) {
+					stopControls = false;
+					up = false;
+					player.setSpeed(2);
+					scrollDown = false;
+					changeLevel = false;
+				}
+			}
+			if (level == 5) {
+				if (scrollDown == true && bossBackgroundY != smallBorder) {
+					stopControls = true;
+					up = true;
+					player.setSpeed((float) 1.5);
+					backgroundY -= 2;
+					background2Y -= 2;
+					background3Y -= 2;
+					background4Y -= 2;
+					bossBackgroundY -= 2;
+				} else if (bossBackgroundY == smallBorder) {
 					stopControls = false;
 					up = false;
 					player.setSpeed(2);
@@ -739,7 +802,7 @@ public class Game extends PApplet {
 	}
 
 	public void reset() {
-		timeLeft = background.width - clock.width - 2;
+		timeLeft = 5;// background.width - clock.width - 2;
 		fireCounter = 0;
 		firing = false;
 		changedSpritePosUp = false;
