@@ -15,8 +15,8 @@ public class Bullet extends GameObj {
 		this.background = w.loadImage("background.png");
 		this.spriteSheet = w.loadImage("bullet.png");
 		this.background = w.loadImage("background.png");
-		this.borderBig = (windowWidth - background.width) / 2;
-		this.borderSmall = (windowHeight - background.height) / 2;
+		this.bigBorder = (windowWidth - background.width) / 2;
+		this.smallBorder = (windowHeight - background.height) / 2;
 		this.spriteHeight = spriteSheet.height;
 		this.spriteWidth = spriteSheet.width;
 		this.x = x;

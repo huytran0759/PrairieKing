@@ -11,8 +11,8 @@ public class Orc extends GameObj {
 		this.spriteSheet = window.loadImage("orcSprites.png");
 		this.deadSpriteSheet = window.loadImage("enemyDeathSprites.png");
 		this.background = w.loadImage("background.png");
-		this.borderBig = (windowWidth - background.width) / 2;
-		this.borderSmall = (windowHeight - background.height) / 2;
+		this.bigBorder = (windowWidth - background.width) / 2;
+		this.smallBorder = (windowHeight - background.height) / 2;
 		this.spriteX = 0;
 		this.spriteY = 0;
 		this.spriteWidth = 32;

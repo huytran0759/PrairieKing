@@ -16,8 +16,8 @@ public class Player extends GameObj {
 		this.spriteSheet = w.loadImage("playerSprites.png");
 		this.deadSpriteSheet = w.loadImage("playerDeathSprites.png");
 		this.background = w.loadImage("background.png");
-		this.borderBig = (windowWidth - background.width) / 2;
-		this.borderSmall = (windowHeight - background.height) / 2;
+		this.bigBorder = (windowWidth - background.width) / 2;
+		this.smallBorder = (windowHeight - background.height) / 2;
 		this.spriteX = 0;
 		this.spriteY = 0;
 		this.spriteWidth = 30;
@@ -57,6 +57,27 @@ public class Player extends GameObj {
 				y += speed * Math.sin(angle);
 			}	
 		}
+	}
+	
+	public void move2(float angle, ArrayList<Barrier> barriers) {
+		if (!isDead && isInWalkingBounds2(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle))) {
+			int numCollide = 0;
+			for (int i = 0; i < barriers.size(); i++) {
+				Barrier b = barriers.get(i);
+				if (isColliding(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle), b)) {
+					numCollide++;
+				}
+			}
+			if (numCollide == 0) {
+				isRunning = true;
+				x += speed * Math.cos(angle);
+				y += speed * Math.sin(angle);
+			}	
+		}
+	}
+	
+	public void moveUp(float y) {
+		this.y -= y;
 	}
 	
 	public boolean isColliding(BackgroundObj b) {

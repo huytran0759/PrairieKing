@@ -7,7 +7,7 @@ public abstract class GameObj {
 
 	PApplet window;
 	PImage spriteSheet, deadSpriteSheet, background;
-	float borderSmall, borderBig;
+	float smallBorder, bigBorder;
 	float x, y;
 	float speed;
 	float hp;
@@ -142,15 +142,22 @@ public abstract class GameObj {
 	}
 
 	public boolean isInWalkingBounds(float x, float y) {
-		if (x > borderBig + spriteWidth && x < windowWidth - borderBig - 2 * spriteWidth
-				&& y > borderSmall + spriteWidth && y < windowHeight - borderSmall - spriteWidth - spriteHeight)
+		if (x > bigBorder && x < windowWidth - bigBorder - spriteWidth
+				&& y > smallBorder && y < windowHeight - smallBorder - spriteHeight)
+			return true;
+		return false;
+	}
+	
+	public boolean isInWalkingBounds2(float x, float y) {
+		if (x > bigBorder && x < windowWidth - bigBorder - spriteWidth
+				&& y > smallBorder && y < windowHeight - smallBorder - 288)
 			return true;
 		return false;
 	}
 
 	public boolean isInBackground(float x, float y) {
-		if (x > borderBig - spriteWidth && x < windowWidth - borderBig && y > borderSmall - spriteHeight
-				&& y < windowHeight - borderSmall)
+		if (x > bigBorder - spriteWidth && x < windowWidth - bigBorder && y > smallBorder - spriteHeight
+				&& y < windowHeight - smallBorder)
 			return true;
 		return false;
 	}
