@@ -35,7 +35,11 @@ public class Game extends PApplet {
 	boolean barriersLvl2Init, barriersLvl3Init, barriersLvl4Init, barriersLvl5Init;
 	boolean stopControls;
 	int fireCounter, timeLeft, gameCounter, respawnCounter, spawnRate, fireCounterLimit, powerUpCounter,
+<<<<<<< HEAD
 			invincibleCounter, flickerCounter;
+=======
+			invincibleCounter;
+>>>>>>> ef8aa203ec896128ce59836b57eb4f128029aa75
 	int level;
 
 	public void settings() {
@@ -43,7 +47,10 @@ public class Game extends PApplet {
 	}
 
 	public void setup() {
+<<<<<<< HEAD
 		size(1280, 720);
+=======
+>>>>>>> ef8aa203ec896128ce59836b57eb4f128029aa75
 		font = createFont("Cambria Math", 20);
 		textFont(font);
 		intro = loadImage("intro.png");
@@ -71,7 +78,7 @@ public class Game extends PApplet {
 		bossBackgroundY = background4Y + background.height;
 		mode = 1;
 		level = 1;
-		timeLeft = background.width - clock.width - 2;
+		timeLeft = 5;// background.width - clock.width - 2;
 		fireCounter = 0;
 		fireCounterLimit = 10;
 		cacti = new ArrayList<Cactus>();
@@ -99,6 +106,7 @@ public class Game extends PApplet {
 		if (mode == 0) {
 			displayIntro();
 		} else if (mode == 1) {
+			System.out.println(level);
 			gameCounter++;
 			image(background, backgroundX, backgroundY);
 			image(background2, background2X, background2Y);
@@ -268,6 +276,15 @@ public class Game extends PApplet {
 			}
 		}
 	}
+	
+	public void initLvl5Barriers() {
+		Barrier b1 = new Barrier(this, bigBorder + 256, smallBorder + 128);
+		barriers.add(b1);
+		for (int i = 0; i < 3; i++) {
+			Barrier b = new Barrier(this, bigBorder + 224 + 32 * i, windowHeight - 128);
+			barriers.add(b);
+		}
+	}
 
 	public void initLvl5Barriers() {
 		Barrier b1 = new Barrier(this, bigBorder + 256, smallBorder + 124);
@@ -346,6 +363,13 @@ public class Game extends PApplet {
 				barriers.add(b);
 			}
 		}
+	}
+	
+	public void initLvl5Cacti() {
+		Cactus c1 = new Cactus(this, bigBorder + 160, smallBorder + 192);
+		cacti.add(c1);
+		Cactus c2 = new Cactus(this, windowWidth - bigBorder - 192, smallBorder + 192);
+		cacti.add(c2);
 	}
 
 	public void initLvl5Cacti() {
@@ -804,9 +828,17 @@ public class Game extends PApplet {
 					level++;
 				}
 			}
+<<<<<<< HEAD
 			if (level == 3) {
 				if (scrollDown == true && background4Y > smallBorder) {
 					player.moveUp((float) 0.8);
+=======
+			if (level == 4) {
+				if (scrollDown == true && background4Y != smallBorder) {
+					stopControls = true;
+					up = true;
+					player.setSpeed((float) 1.2);
+>>>>>>> ef8aa203ec896128ce59836b57eb4f128029aa75
 					backgroundY -= 2;
 					background2Y -= 2;
 					background3Y -= 2;
@@ -834,6 +866,24 @@ public class Game extends PApplet {
 					scrollDown = false;
 					changeLevel = false;
 					level++;
+				}
+			}
+			if (level == 5) {
+				if (scrollDown == true && bossBackgroundY != smallBorder) {
+					stopControls = true;
+					up = true;
+					player.setSpeed((float) 1.5);
+					backgroundY -= 2;
+					background2Y -= 2;
+					background3Y -= 2;
+					background4Y -= 2;
+					bossBackgroundY -= 2;
+				} else if (bossBackgroundY == smallBorder) {
+					stopControls = false;
+					up = false;
+					player.setSpeed(2);
+					scrollDown = false;
+					changeLevel = false;
 				}
 			}
 		}
