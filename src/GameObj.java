@@ -92,7 +92,7 @@ public abstract class GameObj {
 		spriteDeadX = 0;
 	}
 
-	public void subtractHP(int damage) {
+	public void subtractHP(float damage) {
 		if (!isDead) {
 			hp -= damage;
 			if (hp <= 0)
@@ -187,6 +187,10 @@ public abstract class GameObj {
 
 	public int getSpriteY() {
 		return spriteY;
+	}
+	
+	public float getHP() {
+		return hp;
 	}
 
 	public boolean getStatus() {

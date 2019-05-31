@@ -17,29 +17,31 @@ public class Game extends PApplet {
 	int mode;
 	ArrayList<Cactus> cacti;
 	ArrayList<Bullet> bullets;
+	ArrayList<Bullet> enemyBullets;
 	ArrayList<Orc> enemies;
 	ArrayList<Barrier> barriers;
 	ArrayList<BackgroundObj> powerUps;
 	ArrayList<Explosion> explosions;
 	Player player;
+	EnemyPlayer enemyPlayer;
 	Orc orc;
 	boolean up, down, left, right;
 	int previousSpriteX, previousSpriteY;
 	boolean changedSpritePosUp, changedSpritePosDown, changedSpritePosLeft, changedSpritePosRight;
 	boolean changedSpriteShootUp, changedSpriteShootDown, changedSpriteShootLeft, changedSpriteShootRight;
 	boolean firing;
+	boolean enemyFiring;
 	boolean stopAnimate;
 	boolean changeLevel;
 	boolean scrollDown;
 	boolean emptyScreen;
 	boolean barriersLvl2Init, barriersLvl3Init, barriersLvl4Init, barriersLvl5Init;
 	boolean stopControls;
-	int fireCounter, timeLeft, gameCounter, respawnCounter, spawnRate, fireCounterLimit, powerUpCounter,
-<<<<<<< HEAD
+	boolean drawEnemyPlayer;
+	boolean displayEnemyHealth;
+	boolean enemyPlayerAction;
+	int fireCounter, enemyFireCounter, timeLeft, gameCounter, respawnCounter, spawnRate, fireCounterLimit, powerUpCounter,
 			invincibleCounter, flickerCounter;
-=======
-			invincibleCounter;
->>>>>>> ef8aa203ec896128ce59836b57eb4f128029aa75
 	int level;
 
 	public void settings() {
@@ -47,10 +49,7 @@ public class Game extends PApplet {
 	}
 
 	public void setup() {
-<<<<<<< HEAD
 		size(1280, 720);
-=======
->>>>>>> ef8aa203ec896128ce59836b57eb4f128029aa75
 		font = createFont("Cambria Math", 20);
 		textFont(font);
 		intro = loadImage("intro.png");
@@ -80,23 +79,30 @@ public class Game extends PApplet {
 		level = 1;
 		timeLeft = 5;// background.width - clock.width - 2;
 		fireCounter = 0;
+		enemyFireCounter = 0;
 		fireCounterLimit = 10;
 		cacti = new ArrayList<Cactus>();
 		bullets = new ArrayList<Bullet>();
+		enemyBullets = new ArrayList<Bullet>();
 		enemies = new ArrayList<Orc>();
 		barriers = new ArrayList<Barrier>();
 		powerUps = new ArrayList<BackgroundObj>();
 		explosions = new ArrayList<Explosion>();
-		player = new Player(this, windowWidth / 2 - 15, windowHeight / 2 - 16);
+		player = new Player(this, windowWidth / 2, windowHeight / 2);
+		enemyPlayer = new EnemyPlayer(this, windowWidth / 2, windowHeight - smallBorder - 96);
 		stopAnimate = false;
 		changeLevel = false;
 		scrollDown = false;
+		drawEnemyPlayer = false;
+		displayEnemyHealth = false;
+		firing = false;
+		enemyFiring = false;
+		enemyPlayerAction = false;
 		barriersLvl2Init = false;
 		barriersLvl3Init = false;
 		barriersLvl4Init = false;
 		barriersLvl5Init = false;
 		stopControls = false;
-		initLvl1Cacti();
 		powerUpCounter = 0;
 		invincibleCounter = 0;
 		flickerCounter = 0;
@@ -106,7 +112,6 @@ public class Game extends PApplet {
 		if (mode == 0) {
 			displayIntro();
 		} else if (mode == 1) {
-			System.out.println(level);
 			gameCounter++;
 			image(background, backgroundX, backgroundY);
 			image(background2, background2X, background2Y);
@@ -120,6 +125,12 @@ public class Game extends PApplet {
 			drawTimer();
 			drawCacti();
 			player.draw();
+			if (drawEnemyPlayer) {
+				enemyPlayer.draw();
+			}	
+			if (displayEnemyHealth) {
+				drawEnemyHP();
+			}
 			animateGameObj();
 			if (gameCounter < 250 && !changeLevel) {
 				player.setRunning(false);
@@ -128,6 +139,9 @@ public class Game extends PApplet {
 							windowHeight - smallBorder + 5);
 				}
 			} else {
+				if (level == 5) {
+					enemyPlayerAction = true;
+				}
 				respawn();
 				if (level != 5) {
 					drawPowerUps();
@@ -139,6 +153,10 @@ public class Game extends PApplet {
 						timeLeft -= 0.001;
 					playerAction();
 					player.updatePowerUpDuration();
+					if (enemyPlayerAction) {
+						enemyPlayer.moveLeft();
+						enemyFire();
+					}		
 					bulletAction();
 					if (level != 5) {
 						orcAction();
@@ -255,34 +273,30 @@ public class Game extends PApplet {
 
 	public void initLvl4Barriers() {
 		for (int i = 0; i < 7; i++) {
-			if (i < 3 || i > 3) {
-				Barrier b = new Barrier(this, bigBorder + 160 + 32 * i, smallBorder + 164);
-				Barrier c = new Barrier(this, bigBorder + 160 + 32 * i, windowHeight - smallBorder - 164);
+			if (i < 3) {
+				Barrier b = new Barrier(this, bigBorder + 159 + 32 * i, smallBorder + 164);
+				Barrier c = new Barrier(this, bigBorder + 159 + 32 * i, windowHeight - smallBorder - 164);
 				barriers.add(b);
 				barriers.add(c);
+			} else if (i > 3) {
+				Barrier b2 = new Barrier(this, bigBorder + 161 + 32 * i, smallBorder + 164);
+				Barrier c2 = new Barrier(this, bigBorder + 161 + 32 * i, windowHeight - smallBorder - 164);
+				barriers.add(b2);
+				barriers.add(c2);
 			}
 		}
 		for (int i = 0; i < 5; i++) {
 			if (i < 2) {
-				Barrier b = new Barrier(this, bigBorder + 160, smallBorder + 190 + 32 * i);
+				Barrier b = new Barrier(this, bigBorder + 158, smallBorder + 190 + 32 * i);
 				Barrier c = new Barrier(this, windowWidth - bigBorder - 160, smallBorder + 190 + 32 * i);
 				barriers.add(b);
 				barriers.add(c);
 			} else if (i > 2) {
-				Barrier b = new Barrier(this, bigBorder + 160, smallBorder + 194 + 32 * i);
+				Barrier b = new Barrier(this, bigBorder + 158, smallBorder + 194 + 32 * i);
 				Barrier c = new Barrier(this, windowWidth - bigBorder - 160, smallBorder + 194 + 32 * i);
 				barriers.add(b);
 				barriers.add(c);
 			}
-		}
-	}
-	
-	public void initLvl5Barriers() {
-		Barrier b1 = new Barrier(this, bigBorder + 256, smallBorder + 128);
-		barriers.add(b1);
-		for (int i = 0; i < 3; i++) {
-			Barrier b = new Barrier(this, bigBorder + 224 + 32 * i, windowHeight - 128);
-			barriers.add(b);
 		}
 	}
 
@@ -364,13 +378,6 @@ public class Game extends PApplet {
 			}
 		}
 	}
-	
-	public void initLvl5Cacti() {
-		Cactus c1 = new Cactus(this, bigBorder + 160, smallBorder + 192);
-		cacti.add(c1);
-		Cactus c2 = new Cactus(this, windowWidth - bigBorder - 192, smallBorder + 192);
-		cacti.add(c2);
-	}
 
 	public void initLvl5Cacti() {
 		Cactus c1 = new Cactus(this, bigBorder + 160, smallBorder + 190);
@@ -393,6 +400,11 @@ public class Game extends PApplet {
 	public void displayIntro() {
 		background(0);
 		image(intro, (windowWidth - intro.width) / 2, 0);
+	}
+	
+	public void drawEnemyHP() {
+		fill(185, 52, 74);
+		rect(bigBorder, windowHeight - smallBorder + 2, enemyPlayer.getHP(), 10);
 	}
 
 	public void drawTimer() {
@@ -425,7 +437,7 @@ public class Game extends PApplet {
 			if (right)
 				player.move2((float) 0, barriers);
 		}
-		
+
 	}
 
 	public void bulletAction() {
@@ -471,8 +483,28 @@ public class Game extends PApplet {
 				}
 			}
 		}
+		
+		for (int i = 0; i < enemyBullets.size(); i++) {
+			Bullet b = enemyBullets.get(i);
+			if (b.getExists()) {
+				b.draw();
+				if (b.getShootUp()) {
+					enemyPlayer.setShootUp(true);
+					b.move((float) Math.PI * 3 / 2, barriers);
+					if (!b.isInBackground(b.getX(), b.getY())) {
+						b.setShootUp(false);
+						b.setExists(false);
+						enemyPlayer.setShootUp(false);
+					}
+				}
+			}
+		}
 		if (firing) {
 			fireCounter++;
+		}
+		
+		if (enemyFiring) {
+			enemyFireCounter++;
 		}
 
 		// time delay before you can shoot again
@@ -481,6 +513,11 @@ public class Game extends PApplet {
 			player.setSpriteX(previousSpriteX);
 			player.setSpriteY(previousSpriteY);
 			firing = false;
+		}
+		
+		if (enemyFireCounter == fireCounterLimit) {
+			enemyFireCounter = 0;
+			enemyFiring = false;
 		}
 	}
 
@@ -546,6 +583,23 @@ public class Game extends PApplet {
 					}
 					b.setExists(false);
 				}
+			}
+		}
+		for (int i = 0; i < enemyBullets.size(); i++) {
+			Bullet b = enemyBullets.get(i);
+			if (b.isColliding(player) && b.getExists() && !player.getStatus()) {
+				player.setStatus(true);
+				stopAnimate = true;
+				numCollisions++;
+				b.setExists(false);
+			}
+		}
+		
+		for (int i = 0; i < bullets.size(); i++) {
+			Bullet b = bullets.get(i);
+			if (b.isColliding(enemyPlayer) && b.getExists() && !enemyPlayer.getStatus()) {
+				enemyPlayer.subtractHP(b.getDamage());
+				b.setExists(true);
 			}
 		}
 		if (numCollisions > 0) {
@@ -736,6 +790,7 @@ public class Game extends PApplet {
 
 	public void animateGameObj() {
 		player.update();
+		enemyPlayer.update();
 		for (int i = 0; i < cacti.size(); i++) {
 			Cactus c = cacti.get(i);
 			c.update();
@@ -780,12 +835,12 @@ public class Game extends PApplet {
 				flickerCounter++;
 				if (flickerCounter < 15) {
 					image(arrow, bigBorder + 224, windowHeight - smallBorder - 32);
-				} else if (flickerCounter > 30) {
-					flickerCounter = 0;
+				} else if (flickerCounter < 30) {
 					image(tile, bigBorder + 224, windowHeight - smallBorder - 32);
+				} else if (flickerCounter == 30) {
+					flickerCounter = 0;
 				}
 			}
-			flickerCounter = 0;
 			if (player.getY() >= windowHeight - smallBorder - player.getSpriteWidth() - player.getSpriteHeight() - 5
 					&& player.getX() >= bigBorder + 224 && player.getX() <= bigBorder + 320) {
 				up = false;
@@ -828,17 +883,10 @@ public class Game extends PApplet {
 					level++;
 				}
 			}
-<<<<<<< HEAD
+
 			if (level == 3) {
 				if (scrollDown == true && background4Y > smallBorder) {
 					player.moveUp((float) 0.8);
-=======
-			if (level == 4) {
-				if (scrollDown == true && background4Y != smallBorder) {
-					stopControls = true;
-					up = true;
-					player.setSpeed((float) 1.2);
->>>>>>> ef8aa203ec896128ce59836b57eb4f128029aa75
 					backgroundY -= 2;
 					background2Y -= 2;
 					background3Y -= 2;
@@ -852,6 +900,7 @@ public class Game extends PApplet {
 					level++;
 				}
 			}
+
 			if (level == 4) {
 				if (scrollDown == true && bossBackgroundY > smallBorder) {
 					player.moveUp((float) 1);
@@ -868,10 +917,9 @@ public class Game extends PApplet {
 					level++;
 				}
 			}
+
 			if (level == 5) {
 				if (scrollDown == true && bossBackgroundY != smallBorder) {
-					stopControls = true;
-					up = true;
 					player.setSpeed((float) 1.5);
 					backgroundY -= 2;
 					background2Y -= 2;
@@ -879,11 +927,14 @@ public class Game extends PApplet {
 					background4Y -= 2;
 					bossBackgroundY -= 2;
 				} else if (bossBackgroundY == smallBorder) {
+					timeLeft = 0;
 					stopControls = false;
 					up = false;
 					player.setSpeed(2);
 					scrollDown = false;
 					changeLevel = false;
+					drawEnemyPlayer = true;
+					displayEnemyHealth = true;
 				}
 			}
 		}
@@ -959,6 +1010,16 @@ public class Game extends PApplet {
 			o.setMoveDirection(angle);
 			enemies.add(o);
 		}
+	}
+	
+	public void enemyFire() {
+		if (!enemyFiring && !enemyPlayer.getStatus()) {
+			enemyFiring = true;
+			Bullet bullet = new Bullet(this, enemyPlayer.getX() + enemyPlayer.getSpriteWidth() / 2,
+					enemyPlayer.getY() + enemyPlayer.getSpriteHeight() / 2);
+			enemyBullets.add(bullet);
+			bullet.setShootUp(true);
+		}	
 	}
 
 	public void keyPressed() {

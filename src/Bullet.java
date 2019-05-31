@@ -8,7 +8,7 @@ public class Bullet extends GameObj {
 	PImage background;
 	boolean exists;
 	boolean shootUp, shootDown, shootLeft, shootRight;
-	int damage;
+	float damage;
 
 	public Bullet(PApplet w, float x, float y) {
 		this.window = w;
@@ -23,7 +23,7 @@ public class Bullet extends GameObj {
 		this.y = y;
 		this.speed = 10;
 		this.exists = true;
-		this.damage = 2;
+		this.damage = (float) 5;
 		this.shootUp = false;
 		this.shootDown = false;
 		this.shootLeft = false;
@@ -52,7 +52,7 @@ public class Bullet extends GameObj {
 		return shootRight;
 	}
 	
-	public int getDamage() {
+	public float getDamage() {
 		return damage;
 	}
 	
