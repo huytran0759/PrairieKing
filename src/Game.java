@@ -12,13 +12,12 @@ public class Game extends PApplet {
 	int windowWidth = 1280;
 	int windowHeight = 720;
 	float smallBorder, bigBorder;
-	float backgroundX, backgroundY, background2X, background2Y, background3X, background3Y, background4X, background4Y,
-			bossBackgroundX, bossBackgroundY;
+	float backgroundX, backgroundY, background2Y, background3Y, background4Y, bossBackgroundY;
 	int mode;
 	ArrayList<Cactus> cacti;
 	ArrayList<Bullet> bullets;
 	ArrayList<Bullet> enemyBullets;
-	ArrayList<Orc> enemies;
+	ArrayList<Orc> orcs;
 	ArrayList<Barrier> barriers;
 	ArrayList<BackgroundObj> powerUps;
 	ArrayList<Explosion> explosions;
@@ -42,17 +41,18 @@ public class Game extends PApplet {
 	boolean displayEnemyHealth;
 	boolean enemyPlayerAction;
 	boolean displaySpeechBubble;
+	boolean displayEnd;
 	int fireCounter, enemyFireCounter, timeLeft, gameCounter, respawnCounter, spawnRate, fireCounterLimit,
 			powerUpCounter, invincibleCounter, flickerCounter, gameOverCounter, winCounter;
 	int level;
 	int enemyNewX;
 
 	public void settings() {
-		size(1280, 720);
+		size(windowWidth, windowHeight);
 	}
 
 	public void setup() {
-		size(1280, 720);
+		size(windowWidth, windowHeight);
 		font = createFont("Cambria Math", 20);
 		textFont(font);
 		intro = loadImage("intro.png");
@@ -72,13 +72,9 @@ public class Game extends PApplet {
 		smallBorder = (windowHeight - background.height) / 2;
 		backgroundX = bigBorder;
 		backgroundY = smallBorder;
-		background2X = bigBorder;
 		background2Y = windowHeight - smallBorder;
-		background3X = bigBorder;
 		background3Y = background2Y + background.height;
-		background4X = bigBorder;
 		background4Y = background3Y + background.height;
-		bossBackgroundX = bigBorder;
 		bossBackgroundY = background4Y + background.height;
 		mode = 1;
 		level = 1;
@@ -89,7 +85,7 @@ public class Game extends PApplet {
 		cacti = new ArrayList<Cactus>();
 		bullets = new ArrayList<Bullet>();
 		enemyBullets = new ArrayList<Bullet>();
-		enemies = new ArrayList<Orc>();
+		orcs = new ArrayList<Orc>();
 		barriers = new ArrayList<Barrier>();
 		powerUps = new ArrayList<BackgroundObj>();
 		explosions = new ArrayList<Explosion>();
@@ -122,18 +118,20 @@ public class Game extends PApplet {
 		changedEnemySpritePosLeft = false;
 		changedEnemySpritePosRight = false;
 		enemyNewX = (int) windowWidth / 2;
+		displayEnd = false;
 	}
 
 	public void draw() {
 		if (mode == 0) {
 			displayIntro();
 		} else if (mode == 1) {
+			System.out.println(winCounter);
 			gameCounter++;
 			image(background, backgroundX, backgroundY);
-			image(background2, background2X, background2Y);
-			image(background3, background3X, background3Y);
-			image(background4, background4X, background4Y);
-			image(bossBackground, bossBackgroundX, bossBackgroundY);
+			image(background2, backgroundX, background2Y);
+			image(background3, backgroundX, background3Y);
+			image(background4, backgroundX, background4Y);
+			image(bossBackground, backgroundX, bossBackgroundY);
 			drawBorders();
 			fill(255);
 			text("x" + player.getLives(), bigBorder - 45, smallBorder + 17);
@@ -204,7 +202,7 @@ public class Game extends PApplet {
 						changeLevel();
 					} else {
 						checkEmptyScreen();
-						if (emptyScreen) {
+						if (displayEnd) {
 							winCounter++;
 							if (winCounter >= 200) {
 								mode = 2;
@@ -213,45 +211,47 @@ public class Game extends PApplet {
 					}
 				}
 			}
-			if (level == 1) {
+
+			switch (level) {
+			case 1:
 				if (!changeLevel) {
 					if (!barriersLvl1Init) {
-						initLvl1Cacti();
+						initDefaultCacti();
 						barriersLvl1Init = true;
 					}
 				}
-			}
-			if (level == 2) {
+				break;
+			case 2:
 				if (!changeLevel) {
 					if (!barriersLvl2Init) {
-						initLvl1Cacti();
+						initDefaultCacti();
 						initLvl2Barriers();
 						barriersLvl2Init = true;
 					}
 				}
-			}
-			if (level == 3) {
+				break;
+			case 3:
 				if (!changeLevel) {
 					if (!barriersLvl3Init) {
 						barriers.clear();
-						initLvl1Cacti();
+						initDefaultCacti();
 						initLvl3Cacti();
 						initLvl3Barriers();
 						barriersLvl3Init = true;
 					}
 				}
-			}
-			if (level == 4) {
+				break;
+			case 4:
 				if (!changeLevel) {
 					if (!barriersLvl4Init) {
 						barriers.clear();
-						initLvl1Cacti();
+						initDefaultCacti();
 						initLvl4Barriers();
 						barriersLvl4Init = true;
 					}
 				}
-			}
-			if (level == 5) {
+				break;
+			case 5:
 				if (!changeLevel) {
 					if (!barriersLvl5Init) {
 						barriers.clear();
@@ -260,7 +260,9 @@ public class Game extends PApplet {
 						barriersLvl5Init = true;
 					}
 				}
+				break;
 			}
+
 		} else if (mode == 2) {
 			displayEnd();
 		}
@@ -351,7 +353,7 @@ public class Game extends PApplet {
 		}
 	}
 
-	public void initLvl1Cacti() {
+	public void initDefaultCacti() {
 		for (int i = 0; i < 16; i++) {
 			if (i < 7 || i > 9) {
 				Cactus c = new Cactus(this, bigBorder, smallBorder + 32 * i);
@@ -436,7 +438,7 @@ public class Game extends PApplet {
 		background(0);
 		image(intro, (windowWidth - intro.width) / 2, 0);
 	}
-	
+
 	public void displayEnd() {
 		background(0);
 		imageMode(CENTER);
@@ -490,8 +492,7 @@ public class Game extends PApplet {
 					player.setShootUp(true);
 					b.move((float) Math.PI * 3 / 2, barriers);
 					if (!b.isInBackground(b.getX(), b.getY())) {
-						b.setShootUp(false);
-						b.setExists(false);
+						bullets.remove(b);
 						player.setShootUp(false);
 					}
 				}
@@ -499,8 +500,7 @@ public class Game extends PApplet {
 					player.setShootDown(true);
 					b.move((float) Math.PI / 2, barriers);
 					if (!b.isInBackground(b.getX(), b.getY())) {
-						b.setShootDown(false);
-						b.setExists(false);
+						bullets.remove(b);
 						player.setShootDown(false);
 					}
 				}
@@ -508,8 +508,7 @@ public class Game extends PApplet {
 					player.setShootLeft(true);
 					b.move((float) Math.PI, barriers);
 					if (!b.isInBackground(b.getX(), b.getY())) {
-						b.setShootLeft(false);
-						b.setExists(false);
+						bullets.remove(b);
 						player.setShootLeft(false);
 					}
 				}
@@ -517,8 +516,7 @@ public class Game extends PApplet {
 					player.setShootRight(true);
 					b.move(0, barriers);
 					if (!b.isInBackground(b.getX(), b.getY())) {
-						b.setShootRight(false);
-						b.setExists(false);
+						bullets.remove(b);
 						player.setShootRight(false);
 					}
 				}
@@ -533,8 +531,7 @@ public class Game extends PApplet {
 					enemyPlayer.setShootUp(true);
 					b.move((float) Math.PI * 3 / 2, barriers);
 					if (!b.isInBackground(b.getX(), b.getY())) {
-						b.setShootUp(false);
-						b.setExists(false);
+						bullets.remove(b);
 						enemyPlayer.setShootUp(false);
 					}
 				}
@@ -563,8 +560,8 @@ public class Game extends PApplet {
 	}
 
 	public void drawOrcs() {
-		for (int i = 0; i < enemies.size(); i++) {
-			Orc o = enemies.get(i);
+		for (int i = 0; i < orcs.size(); i++) {
+			Orc o = orcs.get(i);
 			o.draw();
 		}
 	}
@@ -577,8 +574,8 @@ public class Game extends PApplet {
 	}
 
 	public void orcAction() {
-		for (int i = 0; i < enemies.size(); i++) {
-			Orc o = enemies.get(i);
+		for (int i = 0; i < orcs.size(); i++) {
+			Orc o = orcs.get(i);
 			if (o.isInWalkingBounds(o.getX(), o.getY())) {
 				o.move(player.getX() + player.getSpriteWidth() / 2, player.getY() + player.getSpriteHeight() / 2,
 						barriers);
@@ -590,8 +587,8 @@ public class Game extends PApplet {
 
 	public void detectCollision() {
 		int numCollisions = 0;
-		for (int i = 0; i < enemies.size(); i++) {
-			Orc o = enemies.get(i);
+		for (int i = 0; i < orcs.size(); i++) {
+			Orc o = orcs.get(i);
 			if (player.isColliding(o) && !o.getDead() && !player.getInvincible()) {
 				player.setStatus(true);
 				player.setPowerUp(false);
@@ -605,24 +602,25 @@ public class Game extends PApplet {
 					o.subtractHP(b.getDamage());
 					if (o.getDead()) {
 						float powerUp = (float) Math.random();
-						if (powerUp <= 0.05) {
+						if (powerUp <= 0.01) {
 							OneUp p = new OneUp(this, o.getX(), o.getY());
 							powerUps.add(p);
-						} else if (powerUp <= 0.1) {
+						} else if (powerUp <= 0.06) {
 							Coffee p = new Coffee(this, o.getX(), o.getY());
 							powerUps.add(p);
 							player.setPowerUp(true);
-						} else if (powerUp <= 0.15) {
+						} else if (powerUp <= 0.11) {
 							MachineGun p = new MachineGun(this, o.getX(), o.getY());
 							powerUps.add(p);
 							player.setPowerUp(true);
-						} else if (powerUp <= 0.175) {
+						} else if (powerUp <= 0.12) {
 							Nuke p = new Nuke(this, o.getX(), o.getY());
 							powerUps.add(p);
 							player.setPowerUp(true);
 						}
 					}
-					b.setExists(false);
+//					b.setExists(false);
+					bullets.remove(b);
 				}
 			}
 		}
@@ -632,7 +630,8 @@ public class Game extends PApplet {
 				player.setStatus(true);
 				stopAnimate = true;
 				numCollisions++;
-				b.setExists(false);
+//				b.setExists(false);
+				enemyBullets.remove(b);
 			}
 		}
 
@@ -641,13 +640,15 @@ public class Game extends PApplet {
 			for (int j = 0; j < bullets.size(); j++) {
 				Bullet pb = bullets.get(j);
 				if (pb.isColliding(b)) {
-					pb.setExists(false);
+//					pb.setExists(false);
+					bullets.remove(pb);
 				}
 			}
 			for (int j = 0; j < enemyBullets.size(); j++) {
 				Bullet eb = enemyBullets.get(j);
 				if (eb.isColliding(b)) {
-					eb.setExists(false);
+//					eb.setExists(false);
+					enemyBullets.remove(eb);
 				}
 			}
 		}
@@ -656,7 +657,8 @@ public class Game extends PApplet {
 			Bullet b = bullets.get(i);
 			if (b.isColliding(enemyPlayer) && b.getExists() && !enemyPlayer.getDead()) {
 				enemyPlayer.subtractHP(b.getDamage());
-				b.setExists(false);
+//				b.setExists(false);
+				bullets.remove(b);
 			}
 		}
 		if (numCollisions > 0) {
@@ -689,8 +691,8 @@ public class Game extends PApplet {
 					} else if (p instanceof Nuke) {
 						if (!p.getUsed()) {
 							player.setPowerUp(true);
-							for (int j = 0; j < enemies.size(); j++) {
-								Orc o = enemies.get(j);
+							for (int j = 0; j < orcs.size(); j++) {
+								Orc o = orcs.get(j);
 								if (!o.getDead()) {
 									o.setStatus(true);
 								}
@@ -716,12 +718,12 @@ public class Game extends PApplet {
 
 	public void respawn() {
 		if (stopAnimate && player.livesLeft()) {
+			player.setInvincible(true);
 			for (int i = 0; i < powerUps.size(); i++) {
 				BackgroundObj b = powerUps.get(i);
 				b.setUsed();
 				b.setStopDraw(true);
 			}
-			player.setInvincible(true);
 			if (gameCounter % 10 == 0 && level != 5) {
 				timeLeft += 1;
 			}
@@ -739,14 +741,14 @@ public class Game extends PApplet {
 							+ (float) Math.random() * (background.width - 3 * player.getSpriteWidth());
 					randomY = smallBorder + player.getSpriteWidth()
 							+ (float) Math.random() * (background.height - 3 * player.getSpriteWidth());
-				} else {
-					randomX = bigBorder + (float) Math.random() * (background.width - player.getSpriteWidth());
-					randomY = smallBorder + (float) Math.random() * 224;
+				} else if (level == 5) {
+					randomX = windowWidth / 2;
+					randomY = windowHeight / 2 - 64;
 				}
 
 				int collisions = 0;
-				for (int i = 0; i < enemies.size(); i++) {
-					Orc o = enemies.get(i);
+				for (int i = 0; i < orcs.size(); i++) {
+					Orc o = orcs.get(i);
 					if (player.isColliding(randomX, randomY, o))
 						collisions++;
 				}
@@ -861,13 +863,13 @@ public class Game extends PApplet {
 
 	public void animateGameObj() {
 		enemyPlayer.update();
-		player.update();	
+		player.update();
 		for (int i = 0; i < cacti.size(); i++) {
 			Cactus c = cacti.get(i);
 			c.update();
 		}
-		for (int i = 0; i < enemies.size(); i++) {
-			Orc o = enemies.get(i);
+		for (int i = 0; i < orcs.size(); i++) {
+			Orc o = orcs.get(i);
 			o.update();
 		}
 		for (int i = 0; i < explosions.size(); i++) {
@@ -881,23 +883,21 @@ public class Game extends PApplet {
 		if (level != 5) {
 			if (timeLeft <= 0) {
 				int orcsDead = 0;
-				for (int i = 0; i < enemies.size(); i++) {
-					Orc o = enemies.get(i);
+				for (int i = 0; i < orcs.size(); i++) {
+					Orc o = orcs.get(i);
 					if (o.getDead()) {
 						orcsDead++;
 					}
 				}
-				if (orcsDead == enemies.size() && enemyPlayer.getDead()) {
+				if (orcsDead == orcs.size()) {
 					emptyScreen = true;
+					changeLevel = true;
 				}
 			}
-
-			if (timeLeft <= 0) {
-				changeLevel = true;
-			}
-		} else {
+		} else if (level == 5) {
 			if (enemyPlayer.getDead()) {
 				emptyScreen = true;
+				displayEnd = true;
 			}
 		}
 	}
@@ -1038,7 +1038,7 @@ public class Game extends PApplet {
 			for (int col = 0; col < 2; col++) {
 				Orc o = new Orc(this, x + 32 * row, y + 32 * col);
 				o.setMoveDirection(angle);
-				enemies.add(o);
+				orcs.add(o);
 			}
 		}
 	}
@@ -1048,7 +1048,7 @@ public class Game extends PApplet {
 			for (int col = 0; col < 3; col++) {
 				Orc o = new Orc(this, x + 32 * row, y + 32 * col);
 				o.setMoveDirection(angle);
-				enemies.add(o);
+				orcs.add(o);
 			}
 		}
 	}
@@ -1056,14 +1056,14 @@ public class Game extends PApplet {
 	public void singleWave(float x, float y, float angle) {
 		Orc o = new Orc(this, x, y);
 		o.setMoveDirection(angle);
-		enemies.add(o);
+		orcs.add(o);
 	}
 
 	public void doubleHorizWave(float x, float y, float angle) {
 		for (int i = 0; i < 2; i++) {
 			Orc o = new Orc(this, x + 32 * i, y);
 			o.setMoveDirection(angle);
-			enemies.add(o);
+			orcs.add(o);
 		}
 	}
 
@@ -1071,7 +1071,7 @@ public class Game extends PApplet {
 		for (int i = 0; i < 2; i++) {
 			Orc o = new Orc(this, x, y + 32 * i);
 			o.setMoveDirection(angle);
-			enemies.add(o);
+			orcs.add(o);
 		}
 	}
 
@@ -1079,7 +1079,7 @@ public class Game extends PApplet {
 		for (int i = 0; i < 3; i++) {
 			Orc o = new Orc(this, x + 32 * i, y);
 			o.setMoveDirection(angle);
-			enemies.add(o);
+			orcs.add(o);
 		}
 	}
 
@@ -1087,7 +1087,7 @@ public class Game extends PApplet {
 		for (int i = 0; i < 3; i++) {
 			Orc o = new Orc(this, x, y + 32 * i);
 			o.setMoveDirection(angle);
-			enemies.add(o);
+			orcs.add(o);
 		}
 	}
 

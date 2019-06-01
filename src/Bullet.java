@@ -23,7 +23,7 @@ public class Bullet extends GameObj {
 		this.y = y;
 		this.speed = 10;
 		this.exists = true;
-		this.damage = (float) 5;
+		this.damage = (float) 10;
 		this.shootUp = false;
 		this.shootDown = false;
 		this.shootLeft = false;
