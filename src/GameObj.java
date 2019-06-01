@@ -94,7 +94,11 @@ public abstract class GameObj {
 
 	public void subtractHP(float damage) {
 		if (!isDead) {
-			hp -= damage;
+			if (hp - damage < 0) {
+				hp = 0;
+			} else {
+				hp -= damage;
+			}		
 			if (hp <= 0)
 				isDead = true;
 		}
@@ -119,6 +123,17 @@ public abstract class GameObj {
 		return false;
 	}
 
+	public boolean isColliding(Barrier b) {
+
+		boolean xOverlap = isIntervalOverlapping(x, x + spriteWidth, b.getX(), b.getX() + b.getSpriteWidth());
+		boolean yOverlap = isIntervalOverlapping(y, y + spriteHeight, b.getY(), b.getY() + b.getSpriteHeight());
+
+		if (xOverlap && yOverlap) {
+			return true;
+		}
+		return false;
+	}
+
 	public boolean isColliding(float x, float y, Barrier b) {
 
 		boolean xOverlap = isIntervalOverlapping(x, x + spriteWidth, b.getX(), b.getX() + b.getSpriteWidth());
@@ -129,7 +144,7 @@ public abstract class GameObj {
 		}
 		return false;
 	}
-	
+
 	public boolean isColliding(float x, float y, Orc o) {
 
 		boolean xOverlap = isIntervalOverlapping(x, x + spriteWidth, o.getX(), o.getX() + o.getSpriteWidth());
@@ -142,15 +157,15 @@ public abstract class GameObj {
 	}
 
 	public boolean isInWalkingBounds(float x, float y) {
-		if (x > bigBorder && x < windowWidth - bigBorder - spriteWidth
-				&& y > smallBorder && y < windowHeight - smallBorder - spriteHeight)
+		if (x > bigBorder && x < windowWidth - bigBorder - spriteWidth && y > smallBorder
+				&& y < windowHeight - smallBorder - spriteHeight)
 			return true;
 		return false;
 	}
-	
+
 	public boolean isInWalkingBounds2(float x, float y) {
-		if (x > bigBorder && x < windowWidth - bigBorder - spriteWidth
-				&& y > smallBorder && y < windowHeight - smallBorder - 288)
+		if (x > bigBorder && x < windowWidth - bigBorder - spriteWidth && y > smallBorder
+				&& y < windowHeight - smallBorder - 288)
 			return true;
 		return false;
 	}
@@ -188,12 +203,12 @@ public abstract class GameObj {
 	public int getSpriteY() {
 		return spriteY;
 	}
-	
+
 	public float getHP() {
 		return hp;
 	}
 
-	public boolean getStatus() {
+	public boolean getDead() {
 		return isDead;
 	}
 

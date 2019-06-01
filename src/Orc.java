@@ -54,6 +54,13 @@ public class Orc extends GameObj {
 			}
 		}
 	}
+	
+	public boolean isInWalkingBounds(float x, float y) {
+		if (x > bigBorder + 32 && x < windowWidth - bigBorder - spriteWidth - 32
+				&& y > smallBorder + 32 && y < windowHeight - smallBorder - spriteHeight - 32)
+			return true;
+		return false;
+	}
 
 	public void moveInBounds(float angle) {
 		if (!isDead) {

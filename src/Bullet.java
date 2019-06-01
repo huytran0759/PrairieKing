@@ -36,6 +36,29 @@ public class Bullet extends GameObj {
 			window.image(spriteSheet, x, y);
 	}
 	
+	public void move(float angle, ArrayList<Barrier> barriers) {
+		if (isInWalkingBounds(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle))) {
+			int numCollide = 0;
+			for (int i = 0; i < barriers.size(); i++) {
+				Barrier b = barriers.get(i);
+				if (isColliding(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle), b)) {
+					numCollide++;
+				}
+			}
+			if (numCollide == 0) {
+				x += speed * Math.cos(angle);
+				y += speed * Math.sin(angle);
+			} else {
+				stopDraw = true;
+				exists = false;
+			}
+
+		} else {
+			stopDraw = true;
+			exists = false;
+		}
+	}
+	
 	public boolean getShootUp() {
 		return shootUp;
 	}
