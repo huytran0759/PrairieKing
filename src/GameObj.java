@@ -15,7 +15,6 @@ public abstract class GameObj {
 	int windowHeight = 720;
 	int spriteWidth, spriteHeight, spriteDeadWidth, spriteDeadHeight;
 	int spriteX, spriteY, spriteDeadX, spriteDeadY;
-	int frameToDisplay;
 	int counter, dyingCounter, deadCounter;
 	boolean isDead;
 	boolean isRunning;
@@ -42,6 +41,7 @@ public abstract class GameObj {
 	public void move(float angle, ArrayList<Barrier> barriers) {
 		if (isInWalkingBounds(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle))) {
 			int numCollide = 0;
+			// check to see if walking location has barrier
 			for (int i = 0; i < barriers.size(); i++) {
 				Barrier b = barriers.get(i);
 				if (isColliding(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle), b)) {
@@ -163,7 +163,7 @@ public abstract class GameObj {
 		return false;
 	}
 
-	public boolean isInWalkingBounds2(float x, float y) {
+	public boolean isInWalkingBounds2(float x, float y) { // walking bounderies for boss level
 		if (x > bigBorder && x < windowWidth - bigBorder - spriteWidth && y > smallBorder
 				&& y < windowHeight - smallBorder - 288)
 			return true;
@@ -171,8 +171,8 @@ public abstract class GameObj {
 	}
 
 	public boolean isInBackground(float x, float y) {
-		if (x > bigBorder - spriteWidth && x < windowWidth - bigBorder && y > smallBorder - spriteHeight
-				&& y < windowHeight - smallBorder)
+		if (x >= bigBorder - spriteWidth && x <= windowWidth - bigBorder && y >= smallBorder - spriteHeight
+				&& y <= windowHeight - smallBorder)
 			return true;
 		return false;
 	}
@@ -228,7 +228,7 @@ public abstract class GameObj {
 		this.spriteY = spriteY;
 	}
 
-	public void setStatus(boolean status) {
+	public void setDead(boolean status) {
 		isDead = status;
 	}
 

@@ -39,6 +39,7 @@ public class Bullet extends GameObj {
 	public void move(float angle, ArrayList<Barrier> barriers) {
 		if (isInWalkingBounds(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle))) {
 			int numCollide = 0;
+			// check if location bullet moving to has a barrier
 			for (int i = 0; i < barriers.size(); i++) {
 				Barrier b = barriers.get(i);
 				if (isColliding(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle), b)) {

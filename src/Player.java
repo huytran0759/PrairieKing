@@ -30,7 +30,6 @@ public class Player extends GameObj {
 		this.y = y;
 		this.speed = 2;
 		this.isDead = false;
-		this.frameToDisplay = 1;
 		this.counter = 0;
 		this.dyingCounter = 0;
 		this.deadCounter = 0;
@@ -45,6 +44,7 @@ public class Player extends GameObj {
 	public void move(float angle, ArrayList<Barrier> barriers) {
 		if (!isDead && isInWalkingBounds(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle))) {
 			int numCollide = 0;
+			// check if location walking to has barrier
 			for (int i = 0; i < barriers.size(); i++) {
 				Barrier b = barriers.get(i);
 				if (isColliding(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle), b)) {
@@ -59,7 +59,7 @@ public class Player extends GameObj {
 		}
 	}
 	
-	public void move2(float angle, ArrayList<Barrier> barriers) {
+	public void move2(float angle, ArrayList<Barrier> barriers) { // movement for boss level
 		if (!isDead && isInWalkingBounds2(x + speed * (float) Math.cos(angle), y + speed * (float) Math.sin(angle))) {
 			int numCollide = 0;
 			for (int i = 0; i < barriers.size(); i++) {

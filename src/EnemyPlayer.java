@@ -21,7 +21,6 @@ public class EnemyPlayer extends GameObj {
 		this.y = y;
 		this.speed = 2;
 		this.isDead = false;
-		this.frameToDisplay = 1;
 		this.counter = 0;
 		this.isRunning = false;
 		this.stopDraw = false;
@@ -54,21 +53,12 @@ public class EnemyPlayer extends GameObj {
 
 		}
 	}
-
-	public void moveLeft() {
+	
+	public void move(float angle) {
 		isRunning = true;
 		spriteY = 32;
-		if (isInWalkingBounds(x - speed, y)) {
-			x -= speed;
-		}
-	}
-
-	public void moveRight() {
-		isRunning = true;
-		spriteX = 32;
-		spriteY = 32;
-		if (isInWalkingBounds(x + speed, y)) {
-			x += speed;
+		if (isInWalkingBounds(x + speed * (float) Math.cos(angle), y)) {
+			x += speed * (float) Math.cos(angle);
 		}
 	}
 
