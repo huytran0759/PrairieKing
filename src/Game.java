@@ -78,9 +78,9 @@ public class Game extends PApplet {
 		background3Y = background2Y + background.height;
 		background4Y = background3Y + background.height;
 		bossBackgroundY = background4Y + background.height;
-		mode = 1;
+		mode = 0;
 		level = 1;
-		maxTimeLeft = 5;//background.width - clock.width - 2;
+		maxTimeLeft = background.width - clock.width - 2;
 		timeLeft = maxTimeLeft;
 		fireCounter = 0;
 		enemyFireCounter = 0;
